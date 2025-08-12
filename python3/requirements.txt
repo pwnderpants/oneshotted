@@ -1,0 +1,6 @@
+# Requirements for OneShotted utility scripts
+# Only external dependencies are listed here
+# Standard library modules (os, sys, argparse, re, etc.) are not included
+
+# Required for delete_markers.py - AWS S3 operations
+boto3>=1.26.0
