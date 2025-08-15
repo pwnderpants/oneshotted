@@ -1,4 +1,26 @@
 
+#### dump_s3_inventory.py
+**AWS S3 Bucket Inventory Export Tool**
+
+Dumps all files in an S3 bucket to a CSV file with detailed information including last modified date, full S3 path, and filename.
+
+- **Purpose**: Create comprehensive inventory exports of S3 bucket contents for auditing, backup verification, or migration planning
+- **Dependencies**: `boto3`, `csv`, `argparse`, `sys`, `datetime`, `botocore.exceptions`
+- **Usage**: 
+  ```bash
+  python dump_s3_inventory.py bucket-name
+  python dump_s3_inventory.py bucket-name -o custom_output.csv
+  python dump_s3_inventory.py bucket-name -p profile-name
+  python dump_s3_inventory.py bucket-name --exclude-dir logs/
+  ```
+- **Features**:
+  - AWS profile support
+  - Custom output filename (defaults to `{bucket_name}_inventory.csv`)
+  - Directory exclusion filtering
+  - Pagination support for large buckets (1000 objects per page)
+  - Comprehensive error handling for credentials, permissions, and bucket existence
+  - CSV export with Last Modified, Full Path, and Filename columns
+
 #### delete_markers.py
 **AWS S3 Delete Markers Listing Tool**
 

@@ -10,6 +10,7 @@ oneshotted/
 ├── README.md
 └── python3/
     ├── delete_markers.py
+    ├── dump_s3_inventory.py
     ├── file_normie.py
     ├── populate_files.py
     └── requirements.txt
