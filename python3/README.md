@@ -82,6 +82,31 @@ Generates random files with various sizes and optional subfolder structure for t
   - Progress animation and verbose output modes
   - Safety confirmation for current directory usage
 
+#### aws_file_name_cheker.py
+**AWS S3 Filename Compatibility Validator**
+
+Validates filenames and directory structures against AWS S3 object key naming rules and best practices.
+
+- **Purpose**: Check files for S3 compatibility before upload to prevent issues with problematic characters, length limits, and naming conventions
+- **Dependencies**: Python standard library only (`sys`, `argparse`, `pathlib`, `typing`, `json`)
+- **Usage**:
+  ```bash
+  python3 aws_file_name_cheker.py /path/to/files
+  python3 aws_file_name_cheker.py /path/to/files --no-recursive
+  python3 aws_file_name_cheker.py /path/to/files --show-valid
+  python3 aws_file_name_cheker.py /path/to/files --output report.txt
+  python3 aws_file_name_cheker.py /path/to/files --json
+  ```
+- **Features**:
+  - Validates against S3 object key length limits (1024 bytes)
+  - Identifies problematic characters (non-printable, avoid chars, extended ASCII)
+  - Flags characters requiring special handling (URL encoding recommended)
+  - Detects trailing periods, relative path elements, and spaces
+  - Recursive or non-recursive directory scanning
+  - Detailed reporting with validation results and recommendations
+  - JSON output format support
+  - Exit codes for CI/CD integration (non-zero if invalid files found)
+
 ## Requirements
 
 - Python 3.x

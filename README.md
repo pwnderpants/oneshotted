@@ -9,6 +9,7 @@ oneshotted/
 ├── LICENSE
 ├── README.md
 └── python3/
+    ├── aws_file_name_cheker.py
     ├── delete_markers.py
     ├── dump_s3_inventory.py
     ├── file_normie.py
