@@ -11,12 +11,16 @@ Dumps all files in an S3 bucket to a CSV file with detailed information includin
   python dump_s3_inventory.py bucket-name
   python dump_s3_inventory.py bucket-name -o custom_output.csv
   python dump_s3_inventory.py bucket-name -p profile-name
-  python dump_s3_inventory.py bucket-name --exclude-dir logs/
+  python dump_s3_inventory.py bucket-name --exclude-dirs logs/
+  python dump_s3_inventory.py bucket-name --exclude-dirs logs/,temp/,cache/
+  python dump_s3_inventory.py bucket-name --exclude-types .jpg,.png,.pdf
+  python dump_s3_inventory.py bucket-name --exclude-dirs logs/,backup/ --exclude-types jpg,png,pdf
   ```
 - **Features**:
   - AWS profile support
   - Custom output filename (defaults to `{bucket_name}_inventory.csv`)
-  - Directory exclusion filtering
+  - Multiple directory exclusion filtering (comma-separated list)
+  - File type exclusion filtering (by extension)
   - Pagination support for large buckets (1000 objects per page)
   - Comprehensive error handling for credentials, permissions, and bucket existence
   - CSV export with Last Modified, Full Path, and Filename columns

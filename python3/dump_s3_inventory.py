@@ -10,7 +10,7 @@ from datetime import datetime
 from botocore.exceptions import ClientError, NoCredentialsError
 
 
-def dump_s3_inventory(bucket_name, output_file, profile_name=None, exclude_dir=None):
+def dump_s3_inventory(bucket_name, output_file, profile_name=None, exclude_dirs=None, exclude_types=None):
     # Dump all S3 objects from bucket to CSV file with pagination
     try:
         
@@ -53,13 +53,29 @@ def dump_s3_inventory(bucket_name, output_file, profile_name=None, exclude_dir=N
                 # Check if we have any objects in this page
                 if 'Contents' in response:
                     for obj in response['Contents']:
-                        # Skip objects in excluded directory if specified
-                        if exclude_dir and obj['Key'].startswith(exclude_dir.rstrip('/') + '/'):
-                            continue
+                        # Skip objects in excluded directories if specified
+                        if exclude_dirs:
+                            skip_object = False
+                            for exclude_dir in exclude_dirs:
+                                if obj['Key'].startswith(exclude_dir):
+                                    skip_object = True
+                                    break
+                            if skip_object:
+                                continue
+                        
+                        # Skip objects with excluded file types if specified
+                        if exclude_types:
+                            file_extension = '.' + obj['Key'].split('.')[-1].lower() if '.' in obj['Key'] else ''
+                            if file_extension in exclude_types:
+                                continue
                         
                         last_modified = obj['LastModified'].strftime('%Y-%m-%d %H:%M:%S UTC')
                         full_path = f"s3://{bucket_name}/{obj['Key']}"
                         filename = obj['Key'].split('/')[-1] if '/' in obj['Key'] else obj['Key']
+                        
+                        # Skip directory paths unless they represent empty directories
+                        if not filename and obj['Key'].endswith('/'):
+                            continue
                         
                         # Write to CSV
                         writer.writerow([last_modified, full_path, filename])
@@ -100,7 +116,8 @@ def main():
     parser.add_argument('-o', '--output', 
                        help='Output CSV file name (default: {bucket_name}_inventory.csv)')
     parser.add_argument('-p', '--profile', help='AWS credential profile to use')
-    parser.add_argument('--exclude-dir', help='Directory path to exclude from inventory')
+    parser.add_argument('--exclude-dirs', help='Comma-separated list of directory paths to exclude from inventory (e.g., logs/,temp/,cache/)')
+    parser.add_argument('--exclude-types', help='Comma-separated list of file extensions to exclude (e.g., .jpg,.png,.pdf)')
     
     args = parser.parse_args()
     
@@ -108,7 +125,19 @@ def main():
     if not args.output:
         args.output = f"{args.bucket_name}_inventory.csv"
     
-    dump_s3_inventory(args.bucket_name, args.output, args.profile, args.exclude_dir)
+    # Parse exclude_dirs into a set for efficient lookup
+    exclude_dirs_set = None
+    if args.exclude_dirs:
+        exclude_dirs_set = set(dir_path.strip().rstrip('/') + '/' for dir_path in args.exclude_dirs.split(','))
+    
+    # Parse exclude_types into a set for efficient lookup
+    exclude_types_set = None
+    if args.exclude_types:
+        exclude_types_set = set(ext.strip().lower() for ext in args.exclude_types.split(','))
+        # Ensure extensions start with a dot
+        exclude_types_set = {ext if ext.startswith('.') else f'.{ext}' for ext in exclude_types_set}
+    
+    dump_s3_inventory(args.bucket_name, args.output, args.profile, exclude_dirs_set, exclude_types_set)
 
 
 if __name__ == '__main__':
